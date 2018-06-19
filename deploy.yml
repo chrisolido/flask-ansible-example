@@ -22,7 +22,7 @@
       - nginx
 
 # Install the app, note: don't do these tasks with become sudo
-- hosts: webservers
+- hosts: all
   tasks:
   - name: clone repo
     git:
@@ -36,7 +36,7 @@
       virtualenv_python: python3.5
 
 # Configure app systemd service and nginx
-- hosts: webservers
+- hosts: all
   become: yes
   become_method: sudo
   tasks:
@@ -67,7 +67,7 @@
       name: Nginx Full
 
 # Run a quick test to verify the site is working
-- hosts: webservers
+- hosts: all
   tasks:
   - name: get url
     get_url:
