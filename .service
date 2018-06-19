@@ -11,3 +11,4 @@ ExecStart=/home/{{ ansible_ssh_user }}/{{ app_name }}/env/bin/gunicorn --workers
 
 [Install]
 WantedBy=multi-user.target
+
