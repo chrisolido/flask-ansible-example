@@ -2,12 +2,14 @@
 
 ---
 # Install system apt packages
-- hosts: all
+- hosts: webservers
   become: yes
   become_method: sudo
   tasks:
   - name: update cache
     apt: name=python-software-properties state=present update_cache=yes cache_valid_time=43200
+  - name: disable lighttpd
+    systemd: name=lighttpd state=stopped enabled=no  # To avoid conflicts with nginx
   - name: install packages
     apt: name={{item}} state=installed
     with_items:
@@ -17,42 +19,42 @@
       - python3-pip
       - python3-dev
       - nginx
+
 # Install the app, note: don't do these tasks with become sudo
-- hosts: all
+- hosts: webservers
   tasks:
   - name: clone repo
     git:
-      repo: 'https://github.com/brennv/flask-ansible-example.git'
-      dest: ~/ 
+      repo: 'https://github.com/{{ github_user }}/{{ app_name }}.git'
+      dest: /home/{{ ansible_ssh_user }}/{{ app_name }}
       update: yes  # Does a git pull if the repo already exists
-    ignore_errors: true
   - name: install modules in a virtualenv
     pip:
-      requirements: ~/flask-ansible-example/requirements.txt
-      virtualenv: ~/flask-ansible-example /env
+      requirements: /home/{{ ansible_ssh_user }}/{{ app_name }}/requirements.txt
+      virtualenv: /home/{{ ansible_ssh_user }}/{{ app_name }}/env
       virtualenv_python: python3.5
 
 # Configure app systemd service and nginx
-- hosts: all
+- hosts: webservers
   become: yes
   become_method: sudo
   tasks:
   - name: template systemd service config
     copy:
       src: .service
-      dest: /etc/systemd/system/flask-ansible-example.service
+      dest: /etc/systemd/system/{{ app_name }}.service
   - name: start systemd app service
-    systemd: name=flask-ansible-example.service state=restarted enabled=yes
+    systemd: name={{ app_name }}.service state=restarted enabled=yes
   - name: template nginx site config
     template:
       src: .nginx
-      dest: /etc/nginx/sites-available/flask-ansible-example
+      dest: /etc/nginx/sites-available/{{ app_name }}
   - name: remove default nginx site config
     file: path=/etc/nginx/sites-enabled/default state=absent
   # - command: mv /etc/nginx/sites-enabled/default /tmp/nginx.sites-enabled.default
   - name: enable nginx site
     file:
-      src: /etc/nginx/sites-available/flask-ansible-example
+      src: /etc/nginx/sites-available/{{ app_name }}
       dest: /etc/nginx/sites-enabled/default
       state: link
       force: yes
@@ -64,11 +66,11 @@
       name: Nginx Full
 
 # Run a quick test to verify the site is working
-- hosts: all
+- hosts: webservers
   tasks:
   - name: get url
     get_url:
-      url: http://192.168.0.123
+      url: http://{{inventory_hostname}}
       dest: /tmp/index.html
   - name: read html
     shell: cat /tmp/index.html

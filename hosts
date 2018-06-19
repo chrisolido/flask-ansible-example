@@ -1,0 +1,10 @@
+[all]
+# Add hosts here
+192.168.0.123
+
+
+[all:vars]
+# Local variables for Ansible playbooks
+ansible_ssh_user=root
+github_user=chrisolido
+app_name=flask-ansible-example  # aligned with github repo name
