@@ -3,6 +3,6 @@ server {
 
     location / {
         include proxy_params;
-        proxy_pass http://unix/root/flask-ansible-example/flask-ansible-example.sock;
+        proxy_pass http://127.0.0.1:5000;
     }
 }
