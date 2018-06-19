@@ -23,13 +23,13 @@
   tasks:
   - name: clone repo
     git:
-      repo: 'https://github.com/{{ github_user }}/{{ app_name }}.git'
-      dest: /home/{{ ansible_ssh_user }}/{{ app_name }}
+      repo: 'https://github.com/"{{ github_user }}"/"{{ app_name }}".git'
+      dest: /home/"{{ ansible_ssh_user }}"/"{{ app_name }}"
       update: yes  # Does a git pull if the repo already exists
   - name: install modules in a virtualenv
     pip:
-      requirements: /home/{{ ansible_ssh_user }}/{{ app_name }}/requirements.txt
-      virtualenv: /home/{{ ansible_ssh_user }}/{{ app_name }}/env
+      requirements: /home/"{{ ansible_ssh_user }}"/"{{ app_name }}"/requirements.txt
+      virtualenv: /home/"{{ ansible_ssh_user }}"/"{{ app_name }}"/env
       virtualenv_python: python3.5
 
 # Configure app systemd service and nginx
@@ -40,19 +40,19 @@
   - name: template systemd service config
     copy:
       src: .service
-      dest: /etc/systemd/system/{{ app_name }}.service
+      dest: /etc/systemd/system/"{{ app_name }}".service
   - name: start systemd app service
-    systemd: name={{ app_name }}.service state=restarted enabled=yes
+    systemd: name="{{ app_name }}".service state=restarted enabled=yes
   - name: template nginx site config
     template:
       src: .nginx
-      dest: /etc/nginx/sites-available/{{ app_name }}
+      dest: /etc/nginx/sites-available/"{{ app_name }}"
   - name: remove default nginx site config
     file: path=/etc/nginx/sites-enabled/default state=absent
   # - command: mv /etc/nginx/sites-enabled/default /tmp/nginx.sites-enabled.default
   - name: enable nginx site
     file:
-      src: /etc/nginx/sites-available/{{ app_name }}
+      src: /etc/nginx/sites-available/"{{ app_name }}"
       dest: /etc/nginx/sites-enabled/default
       state: link
       force: yes
@@ -68,7 +68,7 @@
   tasks:
   - name: get url
     get_url:
-      url: http://{{inventory_hostname}}
+      url: http://"{{inventory_hostname}}"
       dest: /tmp/index.html
   - name: read html
     shell: cat /tmp/index.html
