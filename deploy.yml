@@ -26,8 +26,6 @@
       repo: 'https://github.com/chrisolido/flask-ansible-example.git'
       dest: /root/flask-ansible-example
       update: yes  # Does a git pull if the repo already exists
-  - name: install vitualenv
-    raw: apt install python-virtualenv
   - name: install modules in a virtualenv
     pip:
       requirements: /root/flask-ansible-example/requirements.txt
