@@ -29,6 +29,7 @@
       repo: 'https://github.com/brennv/flask-ansible-example.git'
       dest: ~/ 
       update: yes  # Does a git pull if the repo already exists
+    ignore_errors: true
   - name: install modules in a virtualenv
     pip:
       requirements: ~/flask-ansible-example/requirements.txt
