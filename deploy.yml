@@ -2,7 +2,7 @@
 
 ---
 # Install system apt packages
-- hosts: webservers
+- hosts: all
   become: yes
   become_method: sudo
   tasks:
